@@ -7,6 +7,7 @@ import os
 def get_korean_font(size=48):
     """시스템에서 한글 폰트 찾기"""
     font_paths = [
+        "NanumGothic.ttf",  # 프로젝트 내 폰트 (웹용)
         "/System/Library/Fonts/AppleSDGothicNeo.ttc",
         "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
         "/Library/Fonts/NanumGothic.ttf",

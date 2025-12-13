@@ -22,32 +22,28 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # 한글 폰트 설정
+        import os
         self.font = None
         self.large_font = None
         self.small_font = None
 
-        # 웹 환경인지 체크 (Pygbag)
-        is_web = platform.system() == 'Emscripten' or sys.platform == 'emscripten'
+        # 폰트 검색 순서: 프로젝트 내 폰트 → 시스템 폰트 → 기본 폰트
+        font_paths = [
+            "NanumGothic.ttf",  # 프로젝트 내 폰트 (웹용)
+            "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+            "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
+            "/Library/Fonts/NanumGothic.ttf",
+        ]
 
-        if not is_web:
-            # 로컬 환경: macOS 폰트 시도
-            import os
-            korean_fonts = [
-                "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-                "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
-                "/Library/Fonts/NanumGothic.ttf",
-                "/System/Library/Fonts/Helvetica.ttc",
-            ]
-
-            for fp in korean_fonts:
-                if os.path.exists(fp):
-                    try:
-                        self.font = pygame.font.Font(fp, 28)
-                        self.large_font = pygame.font.Font(fp, 56)
-                        self.small_font = pygame.font.Font(fp, 20)
-                        break
-                    except:
-                        continue
+        for fp in font_paths:
+            if os.path.exists(fp):
+                try:
+                    self.font = pygame.font.Font(fp, 28)
+                    self.large_font = pygame.font.Font(fp, 56)
+                    self.small_font = pygame.font.Font(fp, 20)
+                    break
+                except:
+                    continue
 
         # 폰트 로드 실패 시 기본 폰트
         if self.font is None:
