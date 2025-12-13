@@ -27,26 +27,33 @@ class Game:
         self.large_font = None
         self.small_font = None
 
+        # 현재 스크립트 위치 기준 경로
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
         # 폰트 검색 순서: 프로젝트 내 폰트 → 시스템 폰트 → 기본 폰트
         font_paths = [
-            "NanumGothic.ttf",  # 프로젝트 내 폰트 (웹용)
+            os.path.join(script_dir, "NanumGothic.ttf"),  # 스크립트 폴더 내
+            "NanumGothic.ttf",  # 현재 폴더
             "/System/Library/Fonts/AppleSDGothicNeo.ttc",
             "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
             "/Library/Fonts/NanumGothic.ttf",
         ]
 
         for fp in font_paths:
-            if os.path.exists(fp):
-                try:
+            try:
+                if os.path.exists(fp):
                     self.font = pygame.font.Font(fp, 28)
                     self.large_font = pygame.font.Font(fp, 56)
                     self.small_font = pygame.font.Font(fp, 20)
+                    print(f"Font loaded: {fp}")
                     break
-                except:
-                    continue
+            except Exception as e:
+                print(f"Font load failed: {fp} - {e}")
+                continue
 
         # 폰트 로드 실패 시 기본 폰트
         if self.font is None:
+            print("Using default font")
             self.font = pygame.font.Font(None, 36)
             self.large_font = pygame.font.Font(None, 72)
             self.small_font = pygame.font.Font(None, 24)

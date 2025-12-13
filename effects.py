@@ -6,8 +6,12 @@ import os
 # 한글 폰트 찾기
 def get_korean_font(size=48):
     """시스템에서 한글 폰트 찾기"""
+    # 현재 스크립트 위치 기준 경로
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
     font_paths = [
-        "NanumGothic.ttf",  # 프로젝트 내 폰트 (웹용)
+        os.path.join(script_dir, "NanumGothic.ttf"),  # 스크립트 폴더 내
+        "NanumGothic.ttf",  # 현재 폴더
         "/System/Library/Fonts/AppleSDGothicNeo.ttc",
         "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
         "/Library/Fonts/NanumGothic.ttf",
@@ -15,11 +19,11 @@ def get_korean_font(size=48):
     ]
 
     for font_path in font_paths:
-        if os.path.exists(font_path):
-            try:
+        try:
+            if os.path.exists(font_path):
                 return pygame.font.Font(font_path, size)
-            except:
-                continue
+        except:
+            continue
 
     # 폰트를 찾지 못하면 기본 폰트 반환
     return pygame.font.Font(None, size)
