@@ -148,11 +148,73 @@ ksh/
 
 - Python 3.x
 - pygame
+- pygbag (웹 빌드용)
 
 ## 시스템 요구사항
 
 - macOS (한글 폰트 자동 감지)
 - 다른 OS에서는 기본 폰트 사용 (한글 표시 안 될 수 있음)
+
+---
+
+## 웹 배포 (GitHub Pages)
+
+### 1. Pygbag 설치 및 빌드
+
+```bash
+# Pygbag 설치
+pip install pygbag
+
+# 프로젝트 빌드
+pygbag --build .
+```
+
+빌드 완료 시 `build/web/` 폴더에 웹 파일 생성:
+- `index.html` - 메인 페이지
+- `favicon.png` - 아이콘
+- `ksh.apk` - 게임 데이터 패키지
+
+### 2. GitHub 저장소 생성
+
+```bash
+# Git 초기화
+git init
+
+# 파일 추가
+git add .
+
+# 커밋
+git commit -m "Initial commit"
+
+# GitHub 저장소 연결 (본인 username으로 변경)
+git remote add origin https://github.com/[username]/turtle-game.git
+
+# 푸시
+git push -u origin main
+```
+
+### 3. GitHub Pages 설정 (저장소 설정에서)
+
+1. GitHub 저장소 → **Settings** 탭
+2. 왼쪽 메뉴 → **Pages**
+3. Source: **Deploy from a branch**
+4. Branch: `main` 선택, 폴더: `/build/web` 또는 `/(root)`
+5. **Save** 클릭
+
+### 4. 접속
+
+배포 완료 후 (1~2분):
+```
+https://[username].github.io/turtle-game/
+```
+
+### 웹 버전 제한사항
+
+- 사운드: 브라우저 정책으로 자동 재생 제한될 수 있음
+- 한글 폰트: 웹에서는 기본 폰트 사용 (한글이 깨질 수 있음)
+- 성능: 로컬 실행보다 느릴 수 있음
+
+---
 
 ## 라이선스
 

@@ -21,26 +21,36 @@ class Game:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
 
-        # 한글 폰트 설정 (macOS)
-        korean_fonts = [
-            "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-            "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
-            "/Library/Fonts/NanumGothic.ttf",
-            "/System/Library/Fonts/Helvetica.ttc",
-        ]
+        # 한글 폰트 설정
+        self.font = None
+        self.large_font = None
+        self.small_font = None
 
-        font_path = None
-        for fp in korean_fonts:
+        # 웹 환경인지 체크 (Pygbag)
+        is_web = platform.system() == 'Emscripten' or sys.platform == 'emscripten'
+
+        if not is_web:
+            # 로컬 환경: macOS 폰트 시도
             import os
-            if os.path.exists(fp):
-                font_path = fp
-                break
+            korean_fonts = [
+                "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+                "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
+                "/Library/Fonts/NanumGothic.ttf",
+                "/System/Library/Fonts/Helvetica.ttc",
+            ]
 
-        if font_path:
-            self.font = pygame.font.Font(font_path, 28)
-            self.large_font = pygame.font.Font(font_path, 56)
-            self.small_font = pygame.font.Font(font_path, 20)
-        else:
+            for fp in korean_fonts:
+                if os.path.exists(fp):
+                    try:
+                        self.font = pygame.font.Font(fp, 28)
+                        self.large_font = pygame.font.Font(fp, 56)
+                        self.small_font = pygame.font.Font(fp, 20)
+                        break
+                    except:
+                        continue
+
+        # 폰트 로드 실패 시 기본 폰트
+        if self.font is None:
             self.font = pygame.font.Font(None, 36)
             self.large_font = pygame.font.Font(None, 72)
             self.small_font = pygame.font.Font(None, 24)
@@ -216,8 +226,13 @@ class Game:
         if self.auto_drawer:
             self.auto_drawer.update()
             if self.auto_drawer.is_finished():
-                pygame.time.wait(1000)
-                self._next_stage()
+                # 타이머 기반 대기 (웹 호환)
+                if not hasattr(self, '_wait_timer'):
+                    self._wait_timer = 60  # 60프레임 = 약 1초
+                self._wait_timer -= 1
+                if self._wait_timer <= 0:
+                    del self._wait_timer
+                    self._next_stage()
 
     def draw(self):
         """화면 그리기"""
@@ -783,8 +798,8 @@ class Game:
         self.screen.blit(congrats, (SCREEN_WIDTH // 2 - congrats.get_width() // 2, 300))
         self.screen.blit(restart, (SCREEN_WIDTH // 2 - restart.get_width() // 2, 400))
 
-    def run(self):
-        """메인 게임 루프"""
+    async def run(self):
+        """메인 게임 루프 (async for Pygbag)"""
         running = True
         while running:
             running = self.handle_events()
@@ -792,10 +807,16 @@ class Game:
             self.draw()
             self.clock.tick(60)
 
+            # 브라우저에 제어권 반환 (Pygbag 필수)
+            await asyncio.sleep(0)
+
         pygame.quit()
-        sys.exit()
+
+
+async def main():
+    game = Game()
+    await game.run()
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    asyncio.run(main())
