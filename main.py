@@ -13,6 +13,138 @@ from stage import Stage
 from effects import GlitchEffect, generate_help_path
 
 
+class VirtualDPad:
+    """Virtual D-Pad for touch controls"""
+
+    def __init__(self, x, y, size=120):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.button_size = size // 3
+        self.pressed = {'up': False, 'down': False, 'left': False, 'right': False}
+        self.alpha = 150
+
+    def get_button_rects(self):
+        """Get rectangles for each button"""
+        bs = self.button_size
+        return {
+            'up': pygame.Rect(self.x + bs, self.y, bs, bs),
+            'down': pygame.Rect(self.x + bs, self.y + bs * 2, bs, bs),
+            'left': pygame.Rect(self.x, self.y + bs, bs, bs),
+            'right': pygame.Rect(self.x + bs * 2, self.y + bs, bs, bs),
+            'center': pygame.Rect(self.x + bs, self.y + bs, bs, bs)
+        }
+
+    def handle_touch(self, pos, is_down):
+        """Handle touch event"""
+        rects = self.get_button_rects()
+        for direction, rect in rects.items():
+            if direction != 'center' and rect.collidepoint(pos):
+                self.pressed[direction] = is_down
+                return True
+        return False
+
+    def handle_touch_move(self, pos):
+        """Handle touch move - update all buttons based on position"""
+        rects = self.get_button_rects()
+        for direction in ['up', 'down', 'left', 'right']:
+            self.pressed[direction] = rects[direction].collidepoint(pos)
+
+    def release_all(self):
+        """Release all buttons"""
+        for key in self.pressed:
+            self.pressed[key] = False
+
+    def get_direction(self):
+        """Get current direction as (dx, dy)"""
+        dx, dy = 0, 0
+        if self.pressed['left']:
+            dx = -1
+        if self.pressed['right']:
+            dx = 1
+        if self.pressed['up']:
+            dy = -1
+        if self.pressed['down']:
+            dy = 1
+        return dx, dy
+
+    def draw(self, screen):
+        """Draw the D-Pad"""
+        rects = self.get_button_rects()
+
+        # Create surface with alpha
+        surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+
+        # Draw buttons
+        colors = {
+            'up': (100, 100, 100, self.alpha) if not self.pressed['up'] else (150, 150, 200, self.alpha),
+            'down': (100, 100, 100, self.alpha) if not self.pressed['down'] else (150, 150, 200, self.alpha),
+            'left': (100, 100, 100, self.alpha) if not self.pressed['left'] else (150, 150, 200, self.alpha),
+            'right': (100, 100, 100, self.alpha) if not self.pressed['right'] else (150, 150, 200, self.alpha),
+        }
+
+        bs = self.button_size
+
+        # Up button
+        pygame.draw.rect(surface, colors['up'], (bs, 0, bs, bs), border_radius=8)
+        pygame.draw.polygon(surface, (255, 255, 255, 200),
+                          [(bs + bs//2, 10), (bs + 10, bs - 10), (bs + bs - 10, bs - 10)])
+
+        # Down button
+        pygame.draw.rect(surface, colors['down'], (bs, bs * 2, bs, bs), border_radius=8)
+        pygame.draw.polygon(surface, (255, 255, 255, 200),
+                          [(bs + bs//2, bs * 3 - 10), (bs + 10, bs * 2 + 10), (bs + bs - 10, bs * 2 + 10)])
+
+        # Left button
+        pygame.draw.rect(surface, colors['left'], (0, bs, bs, bs), border_radius=8)
+        pygame.draw.polygon(surface, (255, 255, 255, 200),
+                          [(10, bs + bs//2), (bs - 10, bs + 10), (bs - 10, bs + bs - 10)])
+
+        # Right button
+        pygame.draw.rect(surface, colors['right'], (bs * 2, bs, bs, bs), border_radius=8)
+        pygame.draw.polygon(surface, (255, 255, 255, 200),
+                          [(bs * 3 - 10, bs + bs//2), (bs * 2 + 10, bs + 10), (bs * 2 + 10, bs + bs - 10)])
+
+        # Center
+        pygame.draw.rect(surface, (80, 80, 80, self.alpha), (bs, bs, bs, bs), border_radius=8)
+
+        screen.blit(surface, (self.x, self.y))
+
+
+class ActionButton:
+    """Action button for touch (Start/Restart)"""
+
+    def __init__(self, x, y, size=80):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.pressed = False
+        self.alpha = 150
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.size, self.size)
+
+    def handle_touch(self, pos, is_down):
+        if self.get_rect().collidepoint(pos):
+            self.pressed = is_down
+            return is_down  # Return True only on press
+        return False
+
+    def draw(self, screen, text="OK"):
+        surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+        color = (100, 100, 100, self.alpha) if not self.pressed else (150, 150, 200, self.alpha)
+        pygame.draw.rect(surface, color, (0, 0, self.size, self.size), border_radius=12)
+
+        # Draw text
+        font = pygame.font.Font(None, 32)
+        text_surf = font.render(text, True, (255, 255, 255))
+        text_x = (self.size - text_surf.get_width()) // 2
+        text_y = (self.size - text_surf.get_height()) // 2
+        surface.blit(text_surf, (text_x, text_y))
+
+        screen.blit(surface, (self.x, self.y))
+
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -25,6 +157,12 @@ class Game:
         self.font = pygame.font.Font(None, 36)
         self.large_font = pygame.font.Font(None, 72)
         self.small_font = pygame.font.Font(None, 24)
+
+        # Virtual controls for touch
+        self.dpad = VirtualDPad(20, SCREEN_HEIGHT - 140, 120)
+        self.action_btn = ActionButton(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 80)
+        self.touch_active = False
+        self.active_touch_id = None
 
         self.reset_game()
 
@@ -112,30 +250,79 @@ class Game:
         sound = pygame.mixer.Sound(buffer=sound_buffer)
         sound.play()
 
+    def _get_touch_pos(self, event):
+        """Convert touch event to screen position"""
+        if hasattr(event, 'x') and hasattr(event, 'y'):
+            return (int(event.x * SCREEN_WIDTH), int(event.y * SCREEN_HEIGHT))
+        return None
+
     def handle_events(self):
         """이벤트 처리"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
 
+            # Keyboard events
             if event.type == pygame.KEYDOWN:
-                if self.game_state == "title":
-                    self.game_state = "playing"
+                self._handle_key_action()
 
-                elif self.game_state == "special_wait":
-                    self._start_auto_draw()
+            # Mouse events (also work as touch on some platforms)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+                self.touch_active = True
+                if self.game_state == "playing":
+                    self.dpad.handle_touch(pos, True)
+                if self.action_btn.handle_touch(pos, True):
+                    self._handle_action_button()
 
-                elif self.game_state == "hospital_ending":
-                    # 엔딩 후 계속 진행
-                    self._load_stage()
-                    if not self.stage.is_special_stage():
-                        self.game_state = "playing"
+            if event.type == pygame.MOUSEBUTTONUP:
+                self.touch_active = False
+                self.dpad.release_all()
+                self.action_btn.pressed = False
 
-                elif self.game_state == "gameover" or self.game_state == "win":
-                    if event.key == pygame.K_SPACE:
-                        self.reset_game()
+            if event.type == pygame.MOUSEMOTION and self.touch_active:
+                pos = event.pos
+                if self.game_state == "playing":
+                    self.dpad.handle_touch_move(pos)
+
+            # Touch events (for mobile)
+            if event.type == pygame.FINGERDOWN:
+                pos = self._get_touch_pos(event)
+                if pos:
+                    self.touch_active = True
+                    if self.game_state == "playing":
+                        self.dpad.handle_touch(pos, True)
+                    if self.action_btn.handle_touch(pos, True):
+                        self._handle_action_button()
+
+            if event.type == pygame.FINGERUP:
+                self.touch_active = False
+                self.dpad.release_all()
+                self.action_btn.pressed = False
+
+            if event.type == pygame.FINGERMOTION:
+                pos = self._get_touch_pos(event)
+                if pos and self.game_state == "playing":
+                    self.dpad.handle_touch_move(pos)
 
         return True
+
+    def _handle_key_action(self):
+        """Handle key/touch action for state changes"""
+        if self.game_state == "title":
+            self.game_state = "playing"
+        elif self.game_state == "special_wait":
+            self._start_auto_draw()
+        elif self.game_state == "hospital_ending":
+            self._load_stage()
+            if not self.stage.is_special_stage():
+                self.game_state = "playing"
+        elif self.game_state == "gameover" or self.game_state == "win":
+            self.reset_game()
+
+    def _handle_action_button(self):
+        """Handle action button press"""
+        self._handle_key_action()
 
     def _start_auto_draw(self):
         """자동 그리기 시작 (특수 스테이지)"""
@@ -162,6 +349,7 @@ class Game:
         """플레이 상태 업데이트"""
         keys = pygame.key.get_pressed()
 
+        # Keyboard input
         dx, dy = 0, 0
         if keys[pygame.K_LEFT]:
             dx = -1
@@ -171,6 +359,13 @@ class Game:
             dy = -1
         if keys[pygame.K_DOWN]:
             dy = 1
+
+        # Virtual D-Pad input (combine with keyboard)
+        dpad_dx, dpad_dy = self.dpad.get_direction()
+        if dpad_dx != 0:
+            dx = dpad_dx
+        if dpad_dy != 0:
+            dy = dpad_dy
 
         dx, dy = self.glitch.apply_control_glitch(dx, dy)
 
@@ -244,6 +439,9 @@ class Game:
             (SCREEN_WIDTH // 2 + 30, 320)
         ])
 
+        # Action button for touch
+        self.action_btn.draw(self.screen, "START")
+
     def _draw_game(self):
         """게임 화면"""
         self.stage.draw(self.screen)
@@ -261,6 +459,11 @@ class Game:
         if self.game_state == "playing" and not self.on_path:
             warning = self.font.render("OFF PATH!", True, RED)
             self.screen.blit(warning, (SCREEN_WIDTH // 2 - warning.get_width() // 2, 80))
+
+        # Virtual controls (for touch devices)
+        self.dpad.draw(self.screen)
+        if self.game_state == "special_wait":
+            self.action_btn.draw(self.screen, "GO")
 
     def _draw_ui(self):
         """UI 요소 그리기"""
@@ -326,6 +529,8 @@ class Game:
         if self.hospital_timer > 180:
             text2 = self.small_font.render("Press any key to continue", True, GRAY)
             self.screen.blit(text2, (SCREEN_WIDTH // 2 - text2.get_width() // 2, 550))
+            # Action button for touch
+            self.action_btn.draw(self.screen, "NEXT")
 
     def _draw_gameover(self):
         """게임오버 화면 - 인형들"""
@@ -416,6 +621,9 @@ class Game:
 
         restart = self.font.render("Press SPACE to restart", True, (100, 100, 100))
         self.screen.blit(restart, (SCREEN_WIDTH // 2 - restart.get_width() // 2, 570))
+
+        # Action button for touch
+        self.action_btn.draw(self.screen, "RETRY")
 
     def _draw_teddy_bear(self, x, y, scale=1.0):
         """곰돌이 인형 그리기"""
@@ -768,6 +976,9 @@ class Game:
         self.screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 200))
         self.screen.blit(congrats, (SCREEN_WIDTH // 2 - congrats.get_width() // 2, 300))
         self.screen.blit(restart, (SCREEN_WIDTH // 2 - restart.get_width() // 2, 400))
+
+        # Action button for touch
+        self.action_btn.draw(self.screen, "AGAIN")
 
     async def run(self):
         """메인 게임 루프 (async for Pygbag)"""
