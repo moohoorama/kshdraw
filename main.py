@@ -21,42 +21,10 @@ class Game:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
 
-        # 한글 폰트 설정
-        import os
-        self.font = None
-        self.large_font = None
-        self.small_font = None
-
-        # 현재 스크립트 위치 기준 경로
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # 폰트 검색 순서: 프로젝트 내 폰트 → 시스템 폰트 → 기본 폰트
-        font_paths = [
-            os.path.join(script_dir, "NanumGothic.ttf"),  # 스크립트 폴더 내
-            "NanumGothic.ttf",  # 현재 폴더
-            "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-            "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
-            "/Library/Fonts/NanumGothic.ttf",
-        ]
-
-        for fp in font_paths:
-            try:
-                if os.path.exists(fp):
-                    self.font = pygame.font.Font(fp, 28)
-                    self.large_font = pygame.font.Font(fp, 56)
-                    self.small_font = pygame.font.Font(fp, 20)
-                    print(f"Font loaded: {fp}")
-                    break
-            except Exception as e:
-                print(f"Font load failed: {fp} - {e}")
-                continue
-
-        # 폰트 로드 실패 시 기본 폰트
-        if self.font is None:
-            print("Using default font")
-            self.font = pygame.font.Font(None, 36)
-            self.large_font = pygame.font.Font(None, 72)
-            self.small_font = pygame.font.Font(None, 24)
+        # 기본 시스템 폰트 사용 (영어 호환)
+        self.font = pygame.font.Font(None, 36)
+        self.large_font = pygame.font.Font(None, 72)
+        self.small_font = pygame.font.Font(None, 24)
 
         self.reset_game()
 
@@ -261,9 +229,9 @@ class Game:
     def _draw_title(self):
         """타이틀 화면"""
         title = self.large_font.render("TURTLE DRAWING", True, BLACK)
-        subtitle = self.font.render("아무 키나 눌러서 시작", True, GRAY)
-        hint = self.font.render("점선을 따라가세요!", True, GRAY)
-        warning = self.small_font.render("경고: 공포 요소가 포함되어 있습니다", True, RED)
+        subtitle = self.font.render("Press any key to start", True, GRAY)
+        hint = self.font.render("Follow the dotted line!", True, GRAY)
+        warning = self.small_font.render("WARNING: Contains horror elements", True, RED)
 
         self.screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 200))
         self.screen.blit(subtitle, (SCREEN_WIDTH // 2 - subtitle.get_width() // 2, 350))
@@ -287,19 +255,19 @@ class Game:
         self._draw_ui()
 
         if self.game_state == "special_wait":
-            msg = self.font.render("아무 키나 누르세요...", True, RED)
+            msg = self.font.render("Press any key...", True, RED)
             self.screen.blit(msg, (SCREEN_WIDTH // 2 - msg.get_width() // 2, 50))
 
         if self.game_state == "playing" and not self.on_path:
-            warning = self.font.render("경로 이탈!", True, RED)
+            warning = self.font.render("OFF PATH!", True, RED)
             self.screen.blit(warning, (SCREEN_WIDTH // 2 - warning.get_width() // 2, 80))
 
     def _draw_ui(self):
         """UI 요소 그리기"""
-        stage_text = self.font.render(f"스테이지: {self.current_stage}", True, BLACK)
+        stage_text = self.font.render(f"Stage: {self.current_stage}", True, BLACK)
         self.screen.blit(stage_text, (10, 10))
 
-        lives_text = self.font.render(f"목숨: {'*' * self.lives}", True, RED)
+        lives_text = self.font.render(f"Lives: {'*' * self.lives}", True, RED)
         self.screen.blit(lives_text, (10, 50))
 
         glitch_status = self.glitch.get_status_text()
@@ -307,7 +275,7 @@ class Game:
             glitch_text = self.font.render(f"{glitch_status}", True, (150, 0, 150))
             self.screen.blit(glitch_text, (10, 90))
 
-        controls = self.font.render("방향키로 이동", True, GRAY)
+        controls = self.font.render("Arrow keys to move", True, GRAY)
         self.screen.blit(controls, (SCREEN_WIDTH - controls.get_width() - 10, 10))
 
     def _draw_hospital_ending(self):
@@ -356,7 +324,7 @@ class Game:
             self.screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 500))
 
         if self.hospital_timer > 180:
-            text2 = self.small_font.render("아무 키나 눌러서 계속", True, GRAY)
+            text2 = self.small_font.render("Press any key to continue", True, GRAY)
             self.screen.blit(text2, (SCREEN_WIDTH // 2 - text2.get_width() // 2, 550))
 
     def _draw_gameover(self):
@@ -443,10 +411,10 @@ class Game:
             self.screen.blit(text, (text_x + offset, 25 + random.randint(-2, 2)))
         self.screen.blit(text, (text_x, 25))
 
-        stage_text = self.font.render(f"도달 스테이지: {self.current_stage}", True, (120, 120, 120))
+        stage_text = self.font.render(f"Reached Stage: {self.current_stage}", True, (120, 120, 120))
         self.screen.blit(stage_text, (SCREEN_WIDTH // 2 - stage_text.get_width() // 2, 540))
 
-        restart = self.font.render("SPACE를 눌러 재시작", True, (100, 100, 100))
+        restart = self.font.render("Press SPACE to restart", True, (100, 100, 100))
         self.screen.blit(restart, (SCREEN_WIDTH // 2 - restart.get_width() // 2, 570))
 
     def _draw_teddy_bear(self, x, y, scale=1.0):
@@ -794,8 +762,8 @@ class Game:
     def _draw_win(self):
         """승리 화면"""
         text = self.large_font.render("YOU WIN!", True, GREEN)
-        congrats = self.font.render("축하합니다! 탈출에 성공했습니다!", True, BLACK)
-        restart = self.font.render("SPACE를 눌러 다시 플레이", True, GRAY)
+        congrats = self.font.render("Congratulations! You escaped!", True, BLACK)
+        restart = self.font.render("Press SPACE to play again", True, GRAY)
 
         self.screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 200))
         self.screen.blit(congrats, (SCREEN_WIDTH // 2 - congrats.get_width() // 2, 300))

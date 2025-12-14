@@ -3,49 +3,29 @@ import random
 import math
 import os
 
-# 한글 폰트 찾기
+# 기본 폰트 사용
 def get_korean_font(size=48):
-    """시스템에서 한글 폰트 찾기"""
-    # 현재 스크립트 위치 기준 경로
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    font_paths = [
-        os.path.join(script_dir, "NanumGothic.ttf"),  # 스크립트 폴더 내
-        "NanumGothic.ttf",  # 현재 폴더
-        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-        "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
-        "/Library/Fonts/NanumGothic.ttf",
-        "/Library/Fonts/AppleGothic.ttf",
-    ]
-
-    for font_path in font_paths:
-        try:
-            if os.path.exists(font_path):
-                return pygame.font.Font(font_path, size)
-        except:
-            continue
-
-    # 폰트를 찾지 못하면 기본 폰트 반환
+    """기본 시스템 폰트 반환"""
     return pygame.font.Font(None, size)
 
-# 무서운 문구들 (한글)
+# Creepy messages
 CREEPY_MESSAGES = [
-    "왜 우리를 버렸어?",
-    "왜 구해주지 않은거야?",
-    "우리를 믿었는데...",
-    "우린 죽게 내버려뒀어",
-    "들리니?",
-    "우린 아직 여기 있어",
-    "우리를 잊지마",
-    "다 네 잘못이야",
-    "절대 용서 안해",
-    "도와줘... 제발...",
-    "뒤에 있어",
-    "나를 봐",
-    "눈 돌리지마",
-    "넌 도망칠 수 없어",
-    "같이 놀자",
-    "외로워...",
+    "Why did you leave us?",
+    "Why didn't you save us?",
+    "We trusted you...",
+    "You left us to die",
+    "Can you hear me?",
+    "We're still here",
+    "Don't forget us",
+    "It's all your fault",
+    "I'll never forgive you",
+    "Help me... please...",
+    "I'm behind you",
+    "Look at me",
+    "Don't look away",
+    "You can't escape",
+    "Let's play together",
+    "I'm so lonely...",
 ]
 
 
@@ -883,11 +863,11 @@ class GlitchEffect:
         if random.random() < 0.1:
             if self.font is None:
                 self.font = get_korean_font(36)
-            sans_text = self.font.render("* 나쁜 시간을 보내게 될 거야.", True, (255, 255, 255))
+            sans_text = self.font.render("* You're gonna have a bad time.", True, (255, 255, 255))
             screen.blit(sans_text, (x - int(50*s), y + int(110*s)))
 
     def get_status_text(self):
-        """현재 글리치 상태 텍스트"""
+        """Get current glitch status text"""
         if self.glitch_level == 0:
             return ""
 
@@ -897,15 +877,15 @@ class GlitchEffect:
         if self.control_inverted_v:
             effects.append("???")
         if self.darkness_level > 0:
-            effects.append("어둠")
+            effects.append("DARKNESS")
         if self.show_skull:
             effects.append("...")
         if self.bloody_screen:
-            effects.append("피")
+            effects.append("BLOOD")
         if len(self.enemies) > 0:
-            effects.append("그들이 온다")
+            effects.append("THEY'RE COMING")
 
-        return " | ".join(effects) if effects else "뭔가 이상해..."
+        return " | ".join(effects) if effects else "Something's wrong..."
 
     def reset(self):
         """글리치 효과 초기화"""
