@@ -84,29 +84,38 @@ class VirtualDPad:
         }
 
         bs = self.button_size
+        margin = bs // 5  # Arrow margin from button edge
 
         # Up button
-        pygame.draw.rect(surface, colors['up'], (bs, 0, bs, bs), border_radius=8)
-        pygame.draw.polygon(surface, (255, 255, 255, 200),
-                          [(bs + bs//2, 10), (bs + 10, bs - 10), (bs + bs - 10, bs - 10)])
+        pygame.draw.rect(surface, colors['up'], (bs, 0, bs, bs), border_radius=12)
+        pygame.draw.polygon(surface, (255, 255, 255, 220),
+                          [(bs + bs//2, margin),
+                           (bs + margin, bs - margin),
+                           (bs + bs - margin, bs - margin)])
 
         # Down button
-        pygame.draw.rect(surface, colors['down'], (bs, bs * 2, bs, bs), border_radius=8)
-        pygame.draw.polygon(surface, (255, 255, 255, 200),
-                          [(bs + bs//2, bs * 3 - 10), (bs + 10, bs * 2 + 10), (bs + bs - 10, bs * 2 + 10)])
+        pygame.draw.rect(surface, colors['down'], (bs, bs * 2, bs, bs), border_radius=12)
+        pygame.draw.polygon(surface, (255, 255, 255, 220),
+                          [(bs + bs//2, bs * 3 - margin),
+                           (bs + margin, bs * 2 + margin),
+                           (bs + bs - margin, bs * 2 + margin)])
 
         # Left button
-        pygame.draw.rect(surface, colors['left'], (0, bs, bs, bs), border_radius=8)
-        pygame.draw.polygon(surface, (255, 255, 255, 200),
-                          [(10, bs + bs//2), (bs - 10, bs + 10), (bs - 10, bs + bs - 10)])
+        pygame.draw.rect(surface, colors['left'], (0, bs, bs, bs), border_radius=12)
+        pygame.draw.polygon(surface, (255, 255, 255, 220),
+                          [(margin, bs + bs//2),
+                           (bs - margin, bs + margin),
+                           (bs - margin, bs + bs - margin)])
 
         # Right button
-        pygame.draw.rect(surface, colors['right'], (bs * 2, bs, bs, bs), border_radius=8)
-        pygame.draw.polygon(surface, (255, 255, 255, 200),
-                          [(bs * 3 - 10, bs + bs//2), (bs * 2 + 10, bs + 10), (bs * 2 + 10, bs + bs - 10)])
+        pygame.draw.rect(surface, colors['right'], (bs * 2, bs, bs, bs), border_radius=12)
+        pygame.draw.polygon(surface, (255, 255, 255, 220),
+                          [(bs * 3 - margin, bs + bs//2),
+                           (bs * 2 + margin, bs + margin),
+                           (bs * 2 + margin, bs + bs - margin)])
 
         # Center
-        pygame.draw.rect(surface, (80, 80, 80, self.alpha), (bs, bs, bs, bs), border_radius=8)
+        pygame.draw.rect(surface, (80, 80, 80, self.alpha), (bs, bs, bs, bs), border_radius=12)
 
         screen.blit(surface, (self.x, self.y))
 
@@ -158,9 +167,10 @@ class Game:
         self.large_font = pygame.font.Font(None, 72)
         self.small_font = pygame.font.Font(None, 24)
 
-        # Virtual controls for touch
-        self.dpad = VirtualDPad(20, SCREEN_HEIGHT - 140, 120)
-        self.action_btn = ActionButton(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 80)
+        # Virtual controls for touch (larger for mobile)
+        dpad_size = 240  # 4x bigger
+        self.dpad = VirtualDPad(20, SCREEN_HEIGHT - dpad_size - 20, dpad_size)
+        self.action_btn = ActionButton(SCREEN_WIDTH - 120, SCREEN_HEIGHT - 120, 100)
         self.touch_active = False
         self.active_touch_id = None
 

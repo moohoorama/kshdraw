@@ -432,27 +432,6 @@ frameborder="1"
         info.hidden = debug_hidden
         box.hidden =  debug_hidden
 
-        // iOS Safari touch fix for User Media Engagement
-        function enableUME(e) {
-            if (window.MM && !window.MM.UME) {
-                window.MM.UME = true;
-                console.log("UME enabled via touch/click");
-            }
-        }
-
-        // Add event listeners for iOS Safari
-        document.body.addEventListener('touchstart', enableUME, {passive: true});
-        document.body.addEventListener('touchend', enableUME, {passive: true});
-        document.body.addEventListener('click', enableUME, {passive: true});
-        document.body.addEventListener('mousedown', enableUME, {passive: true});
-
-        // Also add to canvas
-        var canvas = document.getElementById('canvas');
-        if (canvas) {
-            canvas.addEventListener('touchstart', enableUME, {passive: true});
-            canvas.addEventListener('touchend', enableUME, {passive: true});
-            canvas.addEventListener('click', enableUME, {passive: true});
-        }
     }
 
     function custom_prerun(){
