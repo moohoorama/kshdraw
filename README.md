@@ -1,221 +1,201 @@
-# Turtle Drawing Game (거북이 그림 게임)
+# Turtle Drawing Game
 
-Python turtle 그래픽을 모방한 pygame 기반 호러 드로잉 게임입니다.
+A pygame-based horror drawing game inspired by Python turtle graphics.
 
-## 게임 개요
+**Play Now:** https://moohoorama.github.io/kshdraw/
 
-화살표 키로 거북이를 조종하여 점선 경로를 따라 그림을 그리고, 녹색 골 박스에 도달하면 스테이지 클리어입니다.
-단, 경로를 벗어나면 목숨이 줄어들고, 특별한 스테이지에서는 무서운 일들이 일어납니다...
+## Overview
 
-## 실행 방법
+Control the turtle with arrow keys (or touch controls on mobile) to draw along the dotted path. Reach the green goal box to clear each stage.
+But beware - straying from the path costs lives, and special stages bring terrifying surprises...
 
+## How to Run
+
+### Local
 ```bash
 pip install pygame
+make run
+# or
 python main.py
 ```
 
-## 조작법
+### Web Build & Deploy
+```bash
+pip install pygbag
+make deploy   # Build, patch, and push to GitHub Pages
+```
 
-| 키 | 동작 |
+## Controls
+
+### Desktop
+| Key | Action |
 |---|---|
-| ↑ ↓ ← → | 거북이 이동 |
-| SPACE | 게임 시작 / 재시작 |
-| ESC | 게임 종료 |
+| Arrow Keys | Move turtle |
+| SPACE | Start / Restart |
+| ESC | Quit |
 
-## 게임 규칙
+### Mobile (Touch)
+- **D-Pad** (left side): Move turtle
+- **Action Button** (right side): Start / Restart
 
-- **목숨**: 5개
-- **경로 이탈**: 30픽셀 이상 벗어나면 목숨 -1
-- **스테이지**: 총 44개 이상
-- **특별 스테이지**: 숫자에 4가 포함된 스테이지 (4, 14, 24, 34, 44...)
+## Game Rules
 
-## 특별 스테이지 (4가 포함된 숫자)
+- **Lives**: 5
+- **Path Deviation**: Lose 1 life if you stray more than 30 pixels
+- **Stages**: 44+
+- **Special Stages**: Stages containing the number 4 (4, 14, 24, 34, 44...)
 
-4가 포함된 스테이지에서는:
-1. 화면에 "아무 키나 누르세요..." 메시지 표시
-2. 키를 누르면 빨간색으로 무서운 한글 문구가 자동으로 그려짐
-3. 스테이지 클리어 후 **글리치 효과** 누적
+## Special Stages (Numbers with 4)
 
-### 무서운 문구 예시
-- "왜 우리를 버렸어?"
-- "왜 구해주지 않은거야?"
-- "우린 아직 여기 있어"
-- "뒤에 있어"
-- "넌 도망칠 수 없어"
+On special stages:
+1. "Press any key..." message appears
+2. Creepy messages are auto-drawn in red
+3. **Glitch effects** accumulate after clearing
 
-## 글리치 효과 (누적)
+### Creepy Messages
+- "Why did you leave us?"
+- "Why didn't you save us?"
+- "We're still here..."
+- "Behind you..."
+- "You can't escape..."
 
-특별 스테이지를 클리어할 때마다 다음 효과들이 랜덤하게 추가됩니다:
+## Glitch Effects (Cumulative)
 
-### 조작 글리치
-- 좌우 반전
-- 상하 반전
-- 속도 변화
+Each special stage cleared adds random effects:
 
-### 시각 글리치
-- **어둠**: 화면이 점점 어두워짐
-- **해골**: 화면에 리얼한 해골이 랜덤하게 나타남
-- **핏자국**: 화면에 피가 흘러내림
-- **정적 노이즈**: TV 노이즈 효과
-- **화면 흔들림**: 화면이 흔들림
-- **깜빡임**: 화면이 번쩍거림
+### Control Glitches
+- Left/Right inverted
+- Up/Down inverted
+- Speed changes
 
-### 사운드 효과
-- 드론 사운드 (저주파)
-- 속삭임
-- 심장박동
-- 비명
-- 발소리
-- 숨소리
-- 점프스케어 사운드
+### Visual Glitches
+- **Darkness**: Screen gradually darkens
+- **Skulls**: Realistic skulls appear randomly
+- **Blood**: Blood drips down the screen
+- **Static Noise**: TV static effect
+- **Screen Shake**: Screen trembles
+- **Flicker**: Screen flashes
 
-## 적 시스템
+### Sound Effects
+- Drone sounds (low frequency)
+- Whispers
+- Heartbeat
+- Screams
+- Footsteps
+- Breathing
+- Jump scare sounds
 
-글리치 레벨이 올라가면 무서운 적들이 등장합니다:
+## Enemy System
 
-| 적 타입 | 설명 |
+As glitch level increases, terrifying enemies appear:
+
+| Enemy Type | Description |
 |---|---|
-| Shadow (그림자) | 불규칙한 검은 형체, 빨간 눈 |
-| Crawler (기어다니는 것) | 여러 다리로 기어다니는 형태 |
-| Ghost (유령) | 반투명 유령, 물결치는 형태 |
-| Demon (악마) | 뿔과 노란 눈, 날카로운 이빨 |
+| Shadow | Irregular dark form with red eyes |
+| Crawler | Multi-legged crawling creature |
+| Ghost | Translucent, wavy ghost form |
+| Demon | Horns, yellow eyes, sharp teeth |
 
-- 적에게 닿으면 **즉시 게임 오버**
-- 글리치 레벨이 높을수록 적이 빨라지고 더 많이 스폰
+- Touching an enemy = **Instant Game Over**
+- Higher glitch level = Faster enemies, more spawns
 
-## 이스터 에그
+## Easter Egg
 
-- **샌즈 (언더테일)**: 해골 출현 시 5% 확률로 샌즈가 등장
-  - 파란 눈 빛 효과
-  - "* 나쁜 시간을 보내게 될 거야." 메시지
+- **Sans (Undertale)**: 5% chance when skulls appear
+  - Blue eye glow effect
+  - "* You're gonna have a bad time." message
 
-## 엔딩
+## Endings
 
-### 44 스테이지 클리어 - 병실 엔딩
-- 병실 배경 (침대, 의료 장비, 창문)
-- 심전도 모니터의 일직선 (flatline)
-- "삐-" 소리
-- 점점 화면이 어두워짐
+### Stage 44 Clear - Hospital Ending
+- Hospital room background (bed, medical equipment, window)
+- Flatline on heart monitor
+- "Beeeep..." sound
+- Screen fades to black
 
-### 게임 오버 화면
-- 어두운 방 배경
-- 중앙에 스포트라이트를 받는 곰돌이 인형
-- 주변에서 곰돌이를 쳐다보는 여러 인형들
-- 광대 인형
-- 달빛이 비치는 창문
-- 비네팅 효과
+### Game Over Screen
+- Dark room background
+- Teddy bear in spotlight at center
+- Other dolls watching from around
+- Clown doll
+- Moonlit window
+- Vignette effect
 
-## 파일 구조
+## File Structure
 
 ```
 ksh/
-├── main.py           # 메인 게임 루프, 렌더링
-├── utils.py          # 상수, 유틸리티 함수
-├── turtle_player.py  # TurtlePlayer, AutoDrawer 클래스
-├── stage.py          # Stage 클래스, 44개 스테이지 경로 정의
-├── effects.py        # GlitchEffect, Enemy, SoundManager 클래스
-└── README.md         # 이 문서
+├── main.py              # Main game loop, rendering, touch controls
+├── utils.py             # Constants, utility functions
+├── turtle_player.py     # TurtlePlayer, AutoDrawer classes
+├── stage.py             # Stage class, 44+ stage path definitions
+├── effects.py           # GlitchEffect, Enemy, SoundManager classes
+├── Makefile             # Build automation
+├── scripts/
+│   └── patch_index.py   # iOS Safari fix patch script
+├── docs/                # GitHub Pages deployment folder
+│   ├── index.html
+│   ├── favicon.png
+│   └── ksh.apk
+└── README.md
 ```
 
-## 주요 클래스
+## Makefile Commands
+
+```bash
+make help     # Show available commands
+make run      # Run locally with Python
+make build    # Build with pygbag and apply patches
+make deploy   # Build, patch, commit, and push to GitHub
+make patch    # Apply iOS Safari fix only
+make clean    # Remove build directory
+```
+
+## Key Classes
 
 ### `Game` (main.py)
-메인 게임 클래스. 게임 루프, 상태 관리, 렌더링 담당.
+Main game class. Handles game loop, state management, rendering, and touch controls.
+
+### `VirtualDPad` / `ActionButton` (main.py)
+Touch control classes for mobile devices.
 
 ### `TurtlePlayer` (turtle_player.py)
-플레이어가 조종하는 거북이. 이동 및 선 그리기 담당.
+Player-controlled turtle. Handles movement and line drawing.
 
 ### `AutoDrawer` (turtle_player.py)
-특별 스테이지에서 자동으로 문구를 그리는 클래스.
+Auto-draws creepy messages on special stages.
 
 ### `Stage` (stage.py)
-스테이지 경로 정의. 44개 이상의 다양한 모양 포함:
-- 직선, 삼각형, 사각형
-- 별, 하트, 나선
-- 파도, 지그재그, 미로
-- 복잡한 패턴들
+Stage path definitions. 44+ varied shapes:
+- Lines, triangles, squares
+- Stars, hearts, spirals
+- Waves, zigzags, mazes
+- Complex patterns
 
 ### `GlitchEffect` (effects.py)
-글리치 효과 관리. 시각/조작 글리치, 적 스폰 담당.
+Manages glitch effects. Visual/control glitches, enemy spawning.
 
 ### `Enemy` (effects.py)
-적 클래스. 4가지 타입의 적과 AI 이동 담당.
+Enemy class. 4 enemy types with AI movement.
 
 ### `SoundManager` (effects.py)
-프로시저럴 사운드 생성. 외부 오디오 파일 없이 사운드 생성.
+Procedural sound generation. No external audio files needed.
 
-## 의존성
+## Dependencies
 
 - Python 3.x
 - pygame
-- pygbag (웹 빌드용)
+- pygbag (for web build)
 
-## 시스템 요구사항
+## Web Version Notes
 
-- macOS (한글 폰트 자동 감지)
-- 다른 OS에서는 기본 폰트 사용 (한글 표시 안 될 수 있음)
-
----
-
-## 웹 배포 (GitHub Pages)
-
-### 1. Pygbag 설치 및 빌드
-
-```bash
-# Pygbag 설치
-pip install pygbag
-
-# 프로젝트 빌드
-pygbag --build .
-```
-
-빌드 완료 시 `build/web/` 폴더에 웹 파일 생성:
-- `index.html` - 메인 페이지
-- `favicon.png` - 아이콘
-- `ksh.apk` - 게임 데이터 패키지
-
-### 2. GitHub 저장소 생성
-
-```bash
-# Git 초기화
-git init
-
-# 파일 추가
-git add .
-
-# 커밋
-git commit -m "Initial commit"
-
-# GitHub 저장소 연결 (본인 username으로 변경)
-git remote add origin https://github.com/[username]/turtle-game.git
-
-# 푸시
-git push -u origin main
-```
-
-### 3. GitHub Pages 설정 (저장소 설정에서)
-
-1. GitHub 저장소 → **Settings** 탭
-2. 왼쪽 메뉴 → **Pages**
-3. Source: **Deploy from a branch**
-4. Branch: `main` 선택, 폴더: `/build/web` 또는 `/(root)`
-5. **Save** 클릭
-
-### 4. 접속
-
-배포 완료 후 (1~2분):
-```
-https://[username].github.io/turtle-game/
-```
-
-### 웹 버전 제한사항
-
-- 사운드: 브라우저 정책으로 자동 재생 제한될 수 있음
-- 한글 폰트: 웹에서는 기본 폰트 사용 (한글이 깨질 수 있음)
-- 성능: 로컬 실행보다 느릴 수 있음
+- **Touch Support**: Virtual D-Pad and action button for mobile
+- **iOS Safari**: Auto-patched for touch event handling
+- **Sound**: May be limited by browser autoplay policies
+- **Performance**: May be slower than local execution
 
 ---
 
-## 라이선스
+## License
 
-개인 프로젝트
+Personal Project
